@@ -40,26 +40,37 @@ class StringCalc():
 				if word.lower() == 'len' or word.lower() == 'length':
 					try:
 						output = ''.join([output, line])
-						length = self.parseLength(words, wordndx, isMetric) #get back just the number
-						# calculate rounded length
+						length = self.parseLength(words, wordndx, isMetric)
+						rlength = length if isMetric else length / 2.54
 						if isVerbose:
-							pass
-							# append verbose information
+							output = ''.join([output, self.sep, rlength, 'cm' if isMetric else '\"'])
 					except Exception, e:
 						output = ''.join([output, line, self.sep, repr(e)])
 					continue
 				if word.lower() == 'total':
-					pass
-					#append totalTension and set to 0
-					output = ''.join([output, line])
+					output = ''.join([output, line, self.sep, totalTension, 'kg' if isMetric else '#'])
+					totalTension = 0.
+					continue
 				if word.lower() == 'totalx2':
-					pass
-					#append totalTension * 2 and set to 0
-					output = ''.join([output, line])
+					output = ''.join([output, line, self.sep, (totalTension * 2), 'kg' if isMetric else '#'])
+					totalTension = 0.
+					continue
 				else:
 					#looking at a note
-					output = ''.join([output, line])
+					note = 0
+					tension, gauge = 0.
+					doTension = True
 
+					try:
+						note = parseNote(word)
+					except Exception, e:
+						output = ''.join([output, line, self.sep, repr(e)])
+
+					#get next word of string line
+					#** might have to rethink this, need to get next word in list of words
+					#	but dont want to keep referencing them by index :\
+
+			break #next line please
 		return output
 		pass
 
