@@ -57,7 +57,7 @@ class StringCalc():
 			else:
 				#looking at a note
 				note = 0
-				tension, gauge = 0.
+				tension, gauge, frequency = 0.
 				doTension = True
 
 				try:
@@ -74,16 +74,40 @@ class StringCalc():
 					if word[len(word)-1] == 's': #strip 's' off
 						word = word[:len(word)-1]
 
-					wordIsTension = '#' in word or 'kg' in word or 'lb' in word
-					if wordIsTension: #word is tension, we need to calculate the gauge
-						pass
-					else:
-						#word is a gauge, we need to calculate tension
-						pass
-
+					doTension = not('#' in word or 'kg' in word or 'lb' in word)
+					if doTension: #any other unit, we assume word is a gauge, we need to calculate tension
+						gauge = parseGauge(ww) #get gauge from word in inches
+						if gauge < 0.004:
+							raise Exception('Gauge too small: ' + str(gauge) + ' -- 0.004" is the minimum')
+					else: #word is tension, we need to calculate the gauge
+						tension = parseTension(ww) #get tension from word in kg
 				except Exception, e:
 					output = ''.join([output, line, self.sep, repr(e)])
 					continue
+
+				try: #looking at string type now
+					wordndx += 1
+					word = words[wordndx]
+
+					#assign correct weights
+					if word.lower() == 'ckplb':
+						pass
+						#TODO - check string data and add all of the current types
+					elif word.lower() == 'type':
+						pass
+					elif word.lower() == 'type':
+						pass
+					else:
+						raise Exception('Bad string type: ' + str(word))
+				except Exception, e:
+					output = ''.join([output, line, self.sep, repr(e)])
+					continue
+
+				frequency = 440. * pow(pow(2., 1. / 12.), note) #calculate frequency
+				if(doTension):
+					pass
+				else: #we're calculating the gauge - tension was supplied in kgs
+                    double wt = (tension * 980621.) / (4 * fq * fq * length * length) #calculate weight based on tension
 
 		break #next line please
 
