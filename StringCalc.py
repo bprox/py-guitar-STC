@@ -33,44 +33,60 @@ class StringCalc():
 
 			line = self.stripResults(line)
 			words = line.split()
+			wordndx = 0
+			word = words[wordndx]
 
-			for wordndx, word in enumerate(words):
-				pass
-				#strip ':' off of word?
-				if word.lower() == 'len' or word.lower() == 'length':
-					try:
-						output = ''.join([output, line])
-						length = self.parseLength(words, wordndx, isMetric)
-						rlength = length if isMetric else length / 2.54
-						if isVerbose:
-							output = ''.join([output, self.sep, rlength, 'cm' if isMetric else '\"'])
-					except Exception, e:
-						output = ''.join([output, line, self.sep, repr(e)])
+			if word.lower() == 'len' or word.lower() == 'length':
+				try:
+					output = ''.join([output, line])
+					length = self.parseLength(words, wordndx, isMetric)
+					rlength = length if isMetric else length / 2.54
+					if isVerbose:
+						output = ''.join([output, self.sep, rlength, 'cm' if isMetric else '\"'])
+				except Exception, e:
+					output = ''.join([output, line, self.sep, repr(e)])
+				continue
+			if word.lower() == 'total': #can only have 1 total
+				output = ''.join([output, line, self.sep, totalTension, 'kg' if isMetric else '#'])
+				totalTension = 0.
+				continue
+			if word.lower() == 'totalx2': #can only have 1 total
+				output = ''.join([output, line, self.sep, (totalTension * 2), 'kg' if isMetric else '#'])
+				totalTension = 0.
+				continue
+			else:
+				#looking at a note
+				note = 0
+				tension, gauge = 0.
+				doTension = True
+
+				try:
+					note = parseNote(word)
+				except Exception, e:
+					output = ''.join([output, line, self.sep, repr(e)])
 					continue
-				if word.lower() == 'total':
-					output = ''.join([output, line, self.sep, totalTension, 'kg' if isMetric else '#'])
-					totalTension = 0.
+
+				try:	#looking at gauge or tension
+					wordndx += 1
+					word = words[wordndx]
+					if word[len(word)-1] == '.': #strip '.' off
+						word = word[:len(word)-1]
+					if word[len(word)-1] == 's': #strip 's' off
+						word = word[:len(word)-1]
+
+					wordIsTension = '#' in word or 'kg' in word or 'lb' in word
+					if wordIsTension: #word is tension, we need to calculate the gauge
+						pass
+					else:
+						#word is a gauge, we need to calculate tension
+						pass
+
+				except Exception, e:
+					output = ''.join([output, line, self.sep, repr(e)])
 					continue
-				if word.lower() == 'totalx2':
-					output = ''.join([output, line, self.sep, (totalTension * 2), 'kg' if isMetric else '#'])
-					totalTension = 0.
-					continue
-				else:
-					#looking at a note
-					note = 0
-					tension, gauge = 0.
-					doTension = True
 
-					try:
-						note = parseNote(word)
-					except Exception, e:
-						output = ''.join([output, line, self.sep, repr(e)])
+		break #next line please
 
-					#get next word of string line
-					#** might have to rethink this, need to get next word in list of words
-					#	but dont want to keep referencing them by index :\
-
-			break #next line please
 		return output
 		pass
 
