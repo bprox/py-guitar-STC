@@ -58,6 +58,7 @@ class StringCalc():
 				#looking at a note
 				note = 0
 				tension, gauge, frequency = 0.
+				weights = [["placeholder", "placeholder"]]
 				doTension = True
 
 				try:
@@ -91,12 +92,39 @@ class StringCalc():
 
 					#assign correct weights
 					if word.lower() == 'ckplb':
-						pass
-						#TODO - check string data and add all of the current types
-					elif word.lower() == 'type':
-						pass
-					elif word.lower() == 'type':
-						pass
+						weights = self.CKPLB
+					elif word.lower() == 'ckwnb':
+						weights = self.CKWNB
+					elif word.lower() == 'ckplg':
+						weights = self.CKPLG
+					elif word.lower() == 'ckwng':
+						weights = self.CKWNG
+					elif word.lower() == 'dapl':
+						weights = self.DAPL
+					elif word.lower() == 'dapb':
+						weights = self.DAPB
+					elif word.lower() == 'daxs':
+						weights = self.DAXSG
+					elif word.lower() == 'danw':
+						weights = self.DANW
+					elif word.lower() == 'dahr':
+						weights = self.DAHRG
+					elif word.lower() == 'dacg':
+						weights = self.DACG
+					elif word.lower() == 'daft':
+						weights = self.DAFT
+					elif word.lower() == 'dabw':
+						weights = self.DABW
+					elif word.lower() == 'dazw':
+						weights = self.DAZW
+					elif word.lower() == 'daxb':
+						weights = self.DAXB
+					elif word.lower() == 'dahb':
+						weights = self.DAHB
+					elif word.lower() == 'dabc':
+						weights = self.DABC
+					elif word.lower() == 'dabs':
+						weights = self.DABS
 					else:
 						raise Exception('Bad string type: ' + str(word))
 				except Exception, e:
@@ -107,7 +135,10 @@ class StringCalc():
 				if(doTension):
 					pass
 				else: #we're calculating the gauge - tension was supplied in kgs
-                    double wt = (tension * 980621.) / (4 * fq * fq * length * length) #calculate weight based on tension
+                    wt = (tension * 980621.) / (4 * fq * fq * length * length) #calculate weight based on tension
+					gauge = getGauge(wt, weights) #take weight and approximately map a string gauge for it
+					if isMetric:
+						gauge *= 25.4
 
 		break #next line please
 
